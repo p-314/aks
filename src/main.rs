@@ -1,8 +1,9 @@
-use rug::Integer;
-use std::vec;
+use rug::Integer as RInteger;
+use num::{BigUint, Integer, ToPrimitive};
+use std::{vec, str::FromStr};
 
 struct Polynomial {
-    coef: Vec<Integer>,
+    coef: Vec<BigUint>,
 }
 
 impl Polynomial {
@@ -16,11 +17,11 @@ impl Polynomial {
         }
     }
 
-    fn get_coef_unchecked(&self, m: usize) -> &Integer {
+    fn get_coef_unchecked(&self, m: usize) -> &BigUint {
         unsafe { self.coef.get_unchecked(m) }
     }
 
-    fn set_coef_unchecked(&mut self, m: usize, c: Integer) {
+    fn set_coef_unchecked(&mut self, m: usize, c: BigUint) {
         unsafe { 
             *self.coef.get_unchecked_mut(m) = c;
         }
@@ -29,9 +30,9 @@ impl Polynomial {
     fn monom(d: usize) -> Self {
         let mut c = Vec::with_capacity(d);
         for _i in 0..d {
-            c.push(Integer::from(0));
+            c.push(BigUint::from(0u32));
         }
-        c.push(Integer::from(1));
+        c.push(BigUint::from(1u32));
         Polynomial { coef: c }
     }
 
@@ -42,7 +43,7 @@ impl Polynomial {
     fn trim(&mut self) {
         let mut max_deg = self.deg();
         for i in (0..=self.deg()).rev() {
-            if self.coef[i] == 0 {
+            if self.coef[i] == BigUint::from(0u32) {
                 max_deg -= 1;
             } else {
                 break;
@@ -51,7 +52,7 @@ impl Polynomial {
         self.coef = self.coef[..=max_deg].to_vec();
     }
 
-    fn mod_mul(&self, q: &Polynomial, r: usize, n: &Integer) -> Polynomial {
+    fn mod_mul(&self, q: &Polynomial, r: usize, n: &BigUint) -> Polynomial {
         let max_deg;
         if self.deg() + q.deg() < r {
             max_deg = self.deg() + q.deg()
@@ -61,7 +62,7 @@ impl Polynomial {
         let mut res = Polynomial::with_capacity(max_deg);
 
         for i in 0..r {
-            let mut coef = Integer::from(0);
+            let mut coef = BigUint::from(0u32);
 
             let jmin = if i > q.deg() { i - q.deg() } else { 0 };
             let jmax = if i < self.deg() { i } else { self.deg() };
@@ -83,15 +84,15 @@ impl Polynomial {
         res
     }
 
-    fn mod_pow(&self, r: usize, n: &Integer) -> Polynomial {
+    fn mod_pow(&self, r: usize, n: &BigUint) -> Polynomial {
         let mut res = Polynomial::new();
-        res.coef.push(Integer::from(1));
+        res.coef.push(BigUint::from(1u32));
 
-        let mut i = n.significant_bits() + 1;
+        let mut i = n.bits() + 1;
         while i > 0 {
             res = res.mod_mul(&res, r, n);
             i -= 1;
-            if n.get_bit(i) {
+            if n.bit(i) {
                 res = res.mod_mul(self, r, n);
             }
         }
@@ -105,22 +106,22 @@ impl PartialEq for Polynomial {
     }
 }
 
-fn aks(n: &Integer) -> bool {
-    if n.is_perfect_power() {
+fn aks(n: &BigUint) -> bool {
+    if RInteger::from_str(&n.to_string()).unwrap().is_perfect_power() {
         return false;
     }
 
-    let logn = n.significant_bits();
+    let logn = n.bits();
     let maxk = logn * logn;
     let mut r_ui: usize = 2;
 
     loop {
-        let mut pow = Integer::from(1);
+        let mut pow = BigUint::from(1u32);
         let mut found = true;
         for _k in 1..=maxk {
             pow *= n;
             pow %= r_ui;
-            if pow == 1 {
+            if pow == BigUint::from(1u32) {
                 found = false;
                 break;
             }
@@ -130,42 +131,42 @@ fn aks(n: &Integer) -> bool {
         }
         r_ui += 1;
     }
-    let r = Integer::from(r_ui);
+    let r = BigUint::from(r_ui);
     //println!("{}", r);
 
     let mut a = r.clone();
     loop {
-        if a < 2 {
+        if a < 2u32.into() {
             break;
         }
-        let gcd: Integer = n.gcd_ref(&a).into();
-        if 1 < gcd && &gcd < n {
+        let gcd: BigUint = n.gcd(&a);
+        if BigUint::from(1u32) < gcd && &gcd < n {
             return false;
         }
-        a -= 1;
+        a -= 1u32;
     }
 
-    if n <= &r_ui {
+    if n <= &r {
         return true;
     }
 
     //Step 5
-    let rsqrt = (r_ui as f32 - 1.0).sqrt() as u32 + 1;
+    let rsqrt = (r_ui as f32 - 1.0).sqrt() as u64 + 1;
     let maxa = rsqrt * logn;
     for a in 1..=maxa {
         let mut xan = (Polynomial {
-            coef: vec![Integer::from(a), Integer::from(1)],
+            coef: vec![BigUint::from(a), BigUint::from(1u32)],
         })
         .mod_pow(r_ui, &n);
-        let nmodr = n.mod_u(r_ui as u32) as usize;
+        let nmodr = (n % r_ui).to_usize().unwrap();
         if xan.deg() < nmodr {
             return false;
         }
-        xan.coef[nmodr] -= 1;
+        xan.coef[nmodr] -= 1u32;
         xan.coef[0] -= a;
 
         for c in xan.coef {
-            if c % n != 0 {
+            if c % n != 0u32.into() {
                 return false;
             }
         }
@@ -175,7 +176,7 @@ fn aks(n: &Integer) -> bool {
 }
 
 pub mod test {
-    use rug::Integer;
+    use num::BigUint;
     use std::{fs, str::FromStr, time::Instant};
 
     use super::aks;
@@ -183,8 +184,8 @@ pub mod test {
     pub fn test1() {
         let start = Instant::now();
         let mut primes = 0;
-        for n in 1000000..1000100 {
-            let prime = aks(&Integer::from(n));
+        for n in 1000000..1000100usize {
+            let prime = aks(&BigUint::from(n));
             if prime {
                 primes += 1;
             }
@@ -198,7 +199,7 @@ pub mod test {
         let mut output = String::new();
 
         for line in file.split("\n") {
-            let n = Integer::from_str(line).unwrap();
+            let n = BigUint::from_str(line.trim()).unwrap();
             let now = Instant::now();
             let prime = aks(&n);
             let time = now.elapsed();
@@ -213,12 +214,12 @@ pub mod test {
     pub fn test3() {
         let start = Instant::now();
         let prime = "86028121";
-        let is_prime = aks(&Integer::from_str(prime).unwrap());
+        let is_prime = aks(&BigUint::from_str(prime).unwrap());
         println!("{} {}", prime, is_prime);
         println!("{} {:?}", is_prime, start.elapsed())
     }
 }
 
 fn main() {
-    test::test3();
+    test::test2();
 }
