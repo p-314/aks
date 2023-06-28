@@ -20,6 +20,7 @@ impl Polynomial {
         unsafe { *self.coef.get_unchecked(m) }
     }
 
+    #[allow(dead_code)]
     fn set_coef_unchecked(&mut self, m: usize, c: u64) {
         unsafe {
             *self.coef.get_unchecked_mut(m) = c;
