@@ -26,29 +26,8 @@ impl Polynomial {
         }
     }
 
-    fn monom(d: usize) -> Self {
-        let mut c = Vec::with_capacity(d);
-        for _i in 0..d {
-            c.push(0);
-        }
-        c.push(1);
-        Polynomial { coef: c }
-    }
-
     fn deg(&self) -> usize {
         self.coef.len() - 1
-    }
-
-    fn trim(&mut self) {
-        let mut max_deg = self.deg();
-        for i in (0..=self.deg()).rev() {
-            if self.coef[i] == 0 {
-                max_deg -= 1;
-            } else {
-                break;
-            }
-        }
-        self.coef = self.coef[..=max_deg].to_vec();
     }
 
     fn mod_mul(&self, q: &Polynomial, r: usize, n: u64) -> Polynomial {
@@ -58,11 +37,11 @@ impl Polynomial {
         } else {
             max_deg = r - 1;
         }
-        let mut res = Polynomial::with_capacity(max_deg);
-
-        for i in 0..r {
-            let mut coef = 0;
-
+        let mut res = Polynomial::with_capacity(max_deg + 1);
+        
+        let mut coef;
+        for i in 0..=max_deg {
+            coef = 0;
             let jmin = if i > q.deg() { i - q.deg() } else { 0 };
             let jmax = if i < self.deg() { i } else { self.deg() };
 
@@ -138,7 +117,7 @@ fn aks(n: u64) -> bool {
             break;
         }
         let gcd =Integer::from(n).gcd_u64(a).to_u64().unwrap();
-        if 1 < gcd && &gcd < &n {
+        if 1 < gcd && gcd < n {
             return false;
         }
         a -= 1;
@@ -218,5 +197,5 @@ pub mod test {
 }
 
 fn main() {
-    test::test3();
+    test::test1();
 }
