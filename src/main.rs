@@ -4,7 +4,7 @@ pub mod test {
     use std::{fs, str::FromStr, time::Instant};
     use crate::aks_prime::aks;
 
-    pub fn test1() {
+    pub fn test_interval_big() {
         let start = Instant::now();
         let mut primes = 0;
         for n in 1000000..1000100 {
@@ -17,8 +17,8 @@ pub mod test {
         println!("{} {:?}", primes, start.elapsed())
     }
 
-    pub fn test2() {
-        let file = fs::read_to_string("src/test.txt").unwrap();
+    pub fn test_small() {
+        let file = fs::read_to_string("data/test.txt").unwrap();
         let mut output = String::new();
 
         for line in file.split("\n") {
@@ -31,12 +31,12 @@ pub mod test {
             println!("{} {} {:?}", n, prime, time);
         }
 
-        fs::write("times.txt", output).unwrap();
+        fs::write("data/times_small.txt", output).unwrap();
     }
 
-    pub fn test3() {
+    pub fn test_single_big() {
         let start = Instant::now();
-        let prime = "31";
+        let prime = "4093082899";
         let is_prime = aks(u64::from_str(prime).unwrap());
         println!("{} {}", prime, is_prime);
         println!("{} {:?}", is_prime, start.elapsed())
@@ -44,5 +44,6 @@ pub mod test {
 }
 
 fn main() {
-    test::test1();
+    test::test_small();
+    //test::test_single_big();
 }

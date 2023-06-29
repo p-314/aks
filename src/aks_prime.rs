@@ -47,14 +47,14 @@ impl Polynomial {
             let jmax = if i < self.deg() { i } else { self.deg() };
 
             for j in jmin..=jmax {
-                coef += self.get_coef_unchecked(j) * q.get_coef_unchecked(i - j);
+                coef += self.get_coef_unchecked(j) * q.get_coef_unchecked(i - j) % n;
             }
 
             let jmin = i + r - q.deg();
             let jmax = self.deg();
 
             for j in jmin..=jmax {
-                coef += self.get_coef_unchecked(j) * q.get_coef_unchecked(i + r - j);
+                coef += self.get_coef_unchecked(j) * q.get_coef_unchecked(i + r - j) % n;
             }
 
             coef %= n;
@@ -141,7 +141,7 @@ pub fn aks(n: u64) -> bool {
             return false;
         }
         xan.coef[nmodr] -= 1;
-        xan.coef[0] -= a;
+        xan.coef[0] -= a % n;
 
         for c in xan.coef {
             if c % n != 0 {
