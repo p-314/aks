@@ -1,6 +1,7 @@
 use rug::{integer::IntegerExt64, Integer};
 use std::vec;
 
+#[derive(Clone)]
 struct Polynomial {
     coef: Vec<u64>,
 }
@@ -31,36 +32,38 @@ impl Polynomial {
         self.coef.len() - 1
     }
 
-    fn mod_mul(&self, q: &Polynomial, r: usize, n: u64) -> Polynomial {
+    fn mod_mul_assign(&mut self, p: &Polynomial, q: &Polynomial, r: usize, n: u64) {
         let max_deg;
-        if self.deg() + q.deg() < r {
-            max_deg = self.deg() + q.deg()
+        if p.deg() + q.deg() < r {
+            max_deg = p.deg() + q.deg()
         } else {
             max_deg = r - 1;
         }
-        let mut res = Polynomial::with_capacity(max_deg + 1);
+        let cap = self.coef.capacity().max(max_deg + 1);
+        self.coef.clear();
+        self.coef.reserve(cap - self.coef.capacity());
+        //let mut res = Polynomial::with_capacity(max_deg + 1);
 
         let mut coef;
         for i in 0..=max_deg {
             coef = 0;
             let jmin = if i > q.deg() { i - q.deg() } else { 0 };
-            let jmax = if i < self.deg() { i } else { self.deg() };
+            let jmax = if i < p.deg() { i } else { p.deg() };
 
             for j in jmin..=jmax {
-                coef += self.get_coef_unchecked(j) * q.get_coef_unchecked(i - j) % n;
+                coef += p.get_coef_unchecked(j) * q.get_coef_unchecked(i - j) % n;
             }
 
             let jmin = i + r - q.deg();
-            let jmax = self.deg();
+            let jmax = p.deg();
 
             for j in jmin..=jmax {
-                coef += self.get_coef_unchecked(j) * q.get_coef_unchecked(i + r - j) % n;
+                coef += p.get_coef_unchecked(j) * q.get_coef_unchecked(i + r - j) % n;
             }
 
             coef %= n;
-            res.coef.push(coef);
+            self.coef.push(coef);
         }
-        res
     }
 
     fn mod_pow(&self, r: usize, n: u64) -> Polynomial {
@@ -69,10 +72,11 @@ impl Polynomial {
 
         let mut i = (n as f64).log2() as u64 + 1;
         while i > 0 {
-            res = res.mod_mul(&res, r, n);
+            let temp = res.clone();
+            res.mod_mul_assign(&temp, &temp, r, n);
             i -= 1;
             if n >> i & 1 == 1 {
-                res = res.mod_mul(self, r, n);
+                res.mod_mul_assign(&temp, self, r, n);
             }
         }
         res

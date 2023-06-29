@@ -44,6 +44,7 @@ pub mod test {
 }
 
 fn main() {
-    test::test_small();
+    //test::test_small();
+    test::test_interval_big();
     //test::test_single_big();
 }
