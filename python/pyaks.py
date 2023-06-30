@@ -25,7 +25,6 @@ def mul_mod(p, q, r, n):
 
 def pow_mod(p, r, n):
     res = np.array([1])
-    i = int(math.log2(n)) + 1
     for i in range(int(math.log2(n)) + 1, 0, -1):
         res = mul_mod(res, res, r, n)
         if n >> (i - 1) & 1 == 1:
