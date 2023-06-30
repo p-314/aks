@@ -1,7 +1,5 @@
 import numpy as np
 import math
-import matplotlib.pyplot as plt
-
 
 def phi(x):
     res = 0        

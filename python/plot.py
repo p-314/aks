@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from pyaks import sieve, aks
+from akspy import sieve, aks
 import aks as aksr
 import time
 import random
