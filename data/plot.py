@@ -12,11 +12,15 @@ m, c = np.linalg.lstsq(A, np.log2(y)[100:], rcond=None)[0]
 
 print(m, c)
 
+
 plt.loglog(np.log2(x), 2**(np.log2(np.log2(x))*m+c))
 plt.loglog(np.log2(x), y, 'k.', markersize=3)
-#plt.yscale('log')
+plt.xlabel('$\log(n)$')
+plt.ylabel('$t$ in ms')
 plt.show()
 
 plt.plot(np.log2(x), y, 'k.', markersize=3)
 plt.plot(np.log2(x), np.log2(x)**m*2**c)
+plt.xlabel('$\log(n)$')
+plt.ylabel('$t$ in ms')
 plt.show()
