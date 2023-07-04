@@ -22,7 +22,11 @@ def gen_prim_log(n, N):
                 break
             res[i] += 1
     
-    return np.unique(res)
+    pr = np.unique(res)
+    f_write = open('data/prim_log.txt', 'w')
+    for p in pr:
+        f_write.write(str(p) + '\n')
+    return pr
 
 # ~n composites between 2..(N+) (log uniform)
 def gen_comp_log(n, N):
@@ -36,8 +40,14 @@ def gen_comp_log(n, N):
                 break
             res[i] += 1
     
-    return np.unique(res)
+    cp = np.unique(res)
+    f_write = open('data/comp_log.txt', 'w')
+    for c in cp:
+        f_write.write(str(c) + '\n')
+    return cp
     
-        
+
 pr = gen_prim_log(1000, 1000000)
+cp = gen_comp_log(1000, 1000000)
 print(pr, len(pr))
+print(cp, len(cp))
