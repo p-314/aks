@@ -18,7 +18,7 @@ pub mod test {
     }
 
     pub fn test_small() {
-        let file = fs::read_to_string("data/small/test.txt").unwrap();
+        let file = fs::read_to_string("testing/small/test.txt").unwrap();
         let mut output = String::new();
 
         for line in file.split("\n") {
@@ -31,11 +31,11 @@ pub mod test {
             println!("{} {} {:?}", n, prime, time);
         }
 
-        fs::write("data/small/times_small.txt", output).unwrap();
+        fs::write("testing/small/times_small.txt", output).unwrap();
     }
 
     pub fn test_log() {
-        let file_p = fs::read_to_string("data/prim_log.txt").unwrap();
+        let file_p = fs::read_to_string("testing/prim_log.txt").unwrap();
         let mut output = String::new();
 
         for line in file_p.split("\n") {
@@ -49,7 +49,7 @@ pub mod test {
             }
         }
 
-        fs::write("data/prim_log/times_prim_log.txt", output).unwrap();
+        fs::write("testing/prim_log/times_prim_log.txt", output).unwrap();
 
         let file_c = fs::read_to_string("data/comp_log.txt").unwrap();
         let mut output = String::new();
@@ -65,9 +65,25 @@ pub mod test {
             }
         }
 
-        fs::write("data/comp_log/times_comp_log.txt", output).unwrap();
+        fs::write("testing/comp_log/times_comp_log.txt", output).unwrap();        
+    }
 
-        
+    pub fn test_prim_log_int() {
+        let file_p = fs::read_to_string("testing/prim_log_int/prim_log_int.txt").unwrap();
+        let mut output = String::new();
+
+        for line in file_p.split("\n") {
+            if let Ok(n) = u64::from_str(line.trim()) {
+                let now = Instant::now();
+                let prime = aks(n);
+                let time = now.elapsed();
+                output += &format!("{}\n", time.as_micros() as f64 / 1_000_000.0);
+    
+                println!("{} {} {:?}", n, prime, time);    
+            }
+        }
+
+        fs::write("testing/prim_log_int/times_prim_log_int.txt", output).unwrap();
     }
 
     pub fn test_single_big() {
@@ -82,5 +98,6 @@ pub mod test {
 fn main() {
     //test::test_small();
     //test::test_single_big();
-    test::test_log();
+    //test::test_log();
+    test::test_prim_log_int();
 }
