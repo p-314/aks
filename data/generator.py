@@ -23,7 +23,7 @@ def gen_prim_log(n, N):
             res[i] += 1
     
     pr = np.unique(res)
-    f_write = open('data/prim_log.txt', 'w')
+    f_write = open('data/prim_log/prim_log.txt', 'w')
     for p in pr:
         f_write.write(str(p) + '\n')
     return pr
@@ -41,7 +41,7 @@ def gen_comp_log(n, N):
             res[i] += 1
     
     cp = np.unique(res)
-    f_write = open('data/comp_log.txt', 'w')
+    f_write = open('data/comp_log/comp_log.txt', 'w')
     for c in cp:
         f_write.write(str(c) + '\n')
     return cp

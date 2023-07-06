@@ -6,6 +6,8 @@ import time
 import random
 
 
+plt.figure(dpi=300)
+
 def get_values(n, m):
     values = np.zeros(n, dtype=int)
     i = 0
@@ -36,7 +38,7 @@ def test_aks(values):
     for i in range(n):
         means[i] = np.mean(times[max(i - h, 0):min(i + h + 1, n)])
 
-    plt.plot(values, times, '.', label='aks')
+    plt.plot(values, times, '.', label='AKS-Algorithmus')
     plt.plot(values, means, color='blue')
     
     return results
@@ -58,7 +60,7 @@ def test_aksr(values):
     for i in range(n):
         means[i] = np.mean(times[max(i - h, 0):min(i + h + 1, n)])
 
-    plt.plot(values, times, '.', color='black', label='aks (rust)')
+    plt.plot(values, times, '.', color='black', label='AKS-Algorithmus (Rust)')
     plt.plot(values, means, color='black')
     
     return results
@@ -80,13 +82,17 @@ def test_sieve(values):
     for i in range(n):
         means[i] = np.mean(times[max(i - h, 0):min(i + h + 1, n)])
 
-    plt.plot(values, times, '.', color='orange', label='sieve')
-    plt.plot(values, means, color='orange')
+    #plt.plot(np.log2(values), times, '.', markeredgewidth=0.5, markersize=5, color='orange', label='Sieb des Eratosthenes')
+    plt.plot(values, means, color='orange', label='Probedivision')
+    #plt.plot(np.log2(values), means, color='orange', label='Probedivision')
+    #plt.xlabel('$log (n)$')
+    #plt.plot(values, means, color='orange', label='Sieb des Eratosthenes')
+
 
     return results
 
 def test_combi():
-    n = 30
+    n = 50
     m = 1000
     values = get_values(n, m)
 
@@ -95,6 +101,9 @@ def test_combi():
     test_sieve(values)
     
     plt.legend()
+    plt.xlabel('n')
+    plt.ylabel('$t$ in s')
+    plt.savefig('data/combi2')
     plt.show()
 
 
@@ -109,6 +118,14 @@ def check(r1, r2, values):
             return False
     return True
 
+def test_single():
+
+    start = time.perf_counter()
+    prime = aks(15485863)
+    print(prime, time.perf_counter() - start)    
+
 
 test_combi()
 #test3()
+#test_small()
+#test_single()
