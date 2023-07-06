@@ -23,9 +23,10 @@ def mul_mod(p, q, r, n):
 
 def pow_mod(p, r, n):
     res = np.array([1])
-    for i in range(int(math.log2(n)) + 1, 0, -1):
+    bits = int(math.log2(n)) + 1
+    for i in range(bits, -1, -1):
         res = mul_mod(res, res, r, n)
-        if n >> (i - 1) & 1 == 1:
+        if n >> i & 1 == 1:
             res = mul_mod(res, p, r, n)
     return res
 
@@ -56,18 +57,16 @@ def aks(n):
         r += 1
     r -= 1
     
-    print(r)
+    print('r:', r)
     
     #Step 3
     for a in range(r, 1, -1):
         gcd = math.gcd(a, n)
-        if gcd > 1 and gcd < n:
-            #print('s3')
+        if 1 < gcd and gcd < n:
             return False
         
     #Step 4
     if n <= r:
-        #print('s4')
         return True
     
     #Step 5
@@ -75,13 +74,11 @@ def aks(n):
     a = 1
     while a <= maxa:
         p = pow_mod(np.array([a, 1]), r, n)
-        #print(p)
         p[n % r] -= 1
         p[0] -= a
         p %= n
         
         if not np.all(p == 0):
-            #print('s5')
             return False
         
         a += 1
@@ -95,3 +92,7 @@ def sieve(n):
             return False
         i += 1
     return True
+
+if __name__ == '__main__':
+    p = input('p: ')
+    print(aks(p))
