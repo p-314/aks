@@ -94,5 +94,6 @@ def sieve(n):
     return True
 
 if __name__ == '__main__':
-    p = input('p: ')
-    print(aks(p))
+    while True:
+        n = input('n: ')
+        print(aks(n))
