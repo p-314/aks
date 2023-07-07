@@ -94,6 +94,10 @@ def sieve(n):
     return True
 
 if __name__ == '__main__':
+    import time
     while True:
         n = input('n: ')
+        start = time.perf_counter()
+        prime = aks(n)
         print(aks(n))
+        print('t:', time.perf_counter() - start, 's')
