@@ -99,5 +99,6 @@ if __name__ == '__main__':
         n = input('n: ')
         start = time.perf_counter()
         prime = aks(n)
-        print(aks(n))
-        print('t:', time.perf_counter() - start, 's')
+        end = time.perf_counter()
+        print(prime)
+        print('t:', end - start, 's')
