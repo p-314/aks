@@ -9,5 +9,9 @@ name = "aks"
 crate-type = ["cdylib"]
 
 [dependencies]
-pyo3 = "0.19.0"
+num = "0.4.1"
+pyo3 = {version = "0.19.0", optional = true}
 rug = "1.19.2"
+
+[features]
+python = ["pyo3"]

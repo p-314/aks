@@ -1,4 +1,5 @@
-use rug::{integer::IntegerExt64, Integer};
+use rug::Integer;
+use num::integer::gcd;
 use std::vec;
 
 struct Polynomial {
@@ -117,7 +118,8 @@ pub fn aks(n: u64) -> bool {
         if a < 2 {
             break;
         }
-        let gcd = Integer::from(n).gcd_u64(a).to_u64().unwrap();
+        let gcd = gcd(n, a);
+        //let gcd = Integer::from(n).gcd_u64(a).to_u64().unwrap();
         if 1 < gcd && gcd < n {
             return false;
         }
