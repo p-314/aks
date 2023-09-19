@@ -89,8 +89,8 @@ fn is_perfect_power(n: u64) -> bool {
     if n == 0 || n == 1 {
         return true;
     }
-    let max = 64 - n.leading_zeros();
-    for i in 2..max {
+    let max = n.ilog2();
+    for i in 2..=max {
         if n.nth_root(i).pow(i) == n {
             return true;
         }
