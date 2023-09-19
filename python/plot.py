@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from akspy import sieve, aks
-import aks as aksr
 import time
 import random
 
@@ -44,28 +43,6 @@ def test_aks(values):
     return results
 
 
-def test_aksr(values):  
-    n = len(values)  
-
-    times = np.zeros(n)
-    results = np.zeros(n)
-
-    for i in range(n):
-        start = time.perf_counter()
-        results[i] = aksr.prime(values[i])
-        times[i] = time.perf_counter() - start
-    
-    means = np.zeros(n)
-    h = 2
-    for i in range(n):
-        means[i] = np.mean(times[max(i - h, 0):min(i + h + 1, n)])
-
-    plt.plot(values, times, '.', color='black', label='AKS-Algorithmus (Rust)')
-    plt.plot(values, means, color='black')
-    
-    return results
-
-
 def test_sieve(values):
     n = len(values)    
 
@@ -91,22 +68,6 @@ def test_sieve(values):
 
     return results
 
-def test_combi():
-    n = 50
-    m = 1000
-    values = get_values(n, m)
-
-    test_aks(values)
-    test_aksr(values)
-    test_sieve(values)
-    
-    plt.legend()
-    plt.xlabel('n')
-    plt.ylabel('$t$ in s')
-    plt.savefig('data/combi2')
-    plt.show()
-
-
 def test_small():
     for i in range(2, 100):
         print(i, aks(i), sieve(i))
@@ -125,7 +86,6 @@ def test_single():
     print(prime, time.perf_counter() - start)    
 
 
-test_combi()
 #test3()
 #test_small()
 #test_single()

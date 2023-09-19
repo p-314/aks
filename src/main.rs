@@ -99,5 +99,6 @@ fn main() {
     //test::test_small();
     //test::test_single_big();
     //test::test_log();
-    test::test_prim_log_int();
+    //test::test_prim_log_int();
+    test::test_interval_big();
 }
