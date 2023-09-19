@@ -1,5 +1,4 @@
-use rug::Integer;
-use num::integer::gcd;
+use num::integer::{gcd, Roots};
 use std::vec;
 
 struct Polynomial {
@@ -86,8 +85,21 @@ impl PartialEq for Polynomial {
     }
 }
 
+fn is_perfect_power(n: u64) -> bool {
+    if n == 0 || n == 1 {
+        return true;
+    }
+    let max = 64 - n.leading_zeros();
+    for i in 2..max {
+        if n.nth_root(i).pow(i) == n {
+            return true;
+        }
+    }
+    false
+}
+
 pub fn aks(n: u64) -> bool {
-    if Integer::from(n).is_perfect_power() {
+    if is_perfect_power(n) {
         return false;
     }
 
@@ -119,7 +131,6 @@ pub fn aks(n: u64) -> bool {
             break;
         }
         let gcd = gcd(n, a);
-        //let gcd = Integer::from(n).gcd_u64(a).to_u64().unwrap();
         if 1 < gcd && gcd < n {
             return false;
         }
@@ -130,7 +141,6 @@ pub fn aks(n: u64) -> bool {
         return true;
     }
 
-    //Step 5
     let rsqrt = (r_ui as f32 - 1.0).sqrt() as u64 + 1;
     let maxa = rsqrt * logn;
     for a in 1..=maxa {
@@ -153,4 +163,23 @@ pub fn aks(n: u64) -> bool {
     }
 
     return true;
+}
+
+#[cfg(test)]
+mod test {
+    use crate::aks_prime::*;
+
+    #[test]
+    fn perfect_power() {
+        assert!(is_perfect_power(0));
+        assert!(is_perfect_power(1));
+        assert!(is_perfect_power(4));
+        assert!(is_perfect_power(8));
+        assert!(is_perfect_power(9));
+        assert!(is_perfect_power(128));
+
+        assert!(!is_perfect_power(2));
+        assert!(!is_perfect_power(24));
+        assert!(!is_perfect_power(101));
+    }
 }
