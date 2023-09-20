@@ -113,7 +113,8 @@ pub fn aks(n: u64) -> bool {
     }
 
     let logn = n.ilog2() as u64 + 1;
-    let maxk = logn * logn;
+    let lognf64 = (n as f64).log2();
+    let maxk = (lognf64 * lognf64).ceil() as u64;
     let mut r_ui: u64 = 2;
 
     loop {
@@ -195,5 +196,30 @@ mod test {
 
         assert_eq!(p.mod_pow(7, 6), vec![1, 0, 3, 2, 3, 0, 1].into());
         assert_eq!(p.mod_pow(8, 7), vec![1, 0, 0, 0, 0, 0, 0, 1].into());
+    }
+
+    fn trial_division(n: u64) -> bool {
+        let nsqrt = (n as f64).sqrt().ceil() as u64;
+
+        if n == 2 {
+            return true;
+        }
+        if n % 2 == 0 {
+            return false;
+        }
+
+        for d in 3..=nsqrt {
+            if n % d == 0 {
+                return false;
+            }
+        }
+        true
+    }
+
+    #[test]
+    fn small() {
+        for n in 2..10000 {
+            assert_eq!(aks(n), trial_division(n));
+        }
     }
 }
