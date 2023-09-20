@@ -1,6 +1,7 @@
 use num::integer::{gcd, Roots};
 use std::vec;
 
+#[derive(Debug)]
 struct Polynomial {
     coef: Vec<u64>,
 }
@@ -63,11 +64,12 @@ impl Polynomial {
         res
     }
 
+    // panics if n is zero
     fn mod_pow(&self, r: usize, n: u64) -> Polynomial {
         let mut res = Polynomial::new();
         res.coef.push(1);
 
-        let mut i = (n as f64).log2() as u64 + 1;
+        let mut i = n.ilog2() + 1;
         while i > 0 {
             res = res.mod_mul(&res, r, n);
             i -= 1;
@@ -85,6 +87,12 @@ impl PartialEq for Polynomial {
     }
 }
 
+impl From<Vec<u64>> for Polynomial {
+    fn from(v: Vec<u64>) -> Self {
+        Polynomial { coef: v }
+    }
+}
+
 fn is_perfect_power(n: u64) -> bool {
     if n == 0 || n == 1 {
         return true;
@@ -98,12 +106,13 @@ fn is_perfect_power(n: u64) -> bool {
     false
 }
 
+/// Returns `true` iff n is prime using the aks primality test
 pub fn aks(n: u64) -> bool {
     if is_perfect_power(n) {
         return false;
     }
 
-    let logn = (n as f64).log2() as u64;
+    let logn = n.ilog2() as u64 + 1;
     let maxk = logn * logn;
     let mut r_ui: u64 = 2;
 
@@ -144,10 +153,7 @@ pub fn aks(n: u64) -> bool {
     let rsqrt = (r_ui as f32 - 1.0).sqrt() as u64 + 1;
     let maxa = rsqrt * logn;
     for a in 1..=maxa {
-        let mut xan = (Polynomial {
-            coef: vec![a as u64, 1],
-        })
-        .mod_pow(r_ui as usize, n);
+        let mut xan = Polynomial::from(vec![a , 1]).mod_pow(r_ui as usize, n);
         let nmodr = (n % r_ui) as usize;
         if xan.deg() < nmodr {
             return false;
@@ -181,5 +187,13 @@ mod test {
         assert!(!is_perfect_power(2));
         assert!(!is_perfect_power(24));
         assert!(!is_perfect_power(101));
+    }
+
+    #[test]
+    fn mod_pow() {
+        let p = Polynomial { coef: vec![1, 1] };
+
+        assert_eq!(p.mod_pow(7, 6), vec![1, 0, 3, 2, 3, 0, 1].into());
+        assert_eq!(p.mod_pow(8, 7), vec![1, 0, 0, 0, 0, 0, 0, 1].into());
     }
 }

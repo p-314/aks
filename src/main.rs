@@ -88,7 +88,7 @@ pub mod test {
 
     pub fn test_single_big() {
         let start = Instant::now();
-        let prime = "4093082899";
+        let prime = "15485863";
         let is_prime = aks(u64::from_str(prime).unwrap());
         println!("{} {}", prime, is_prime);
         println!("{} {:?}", is_prime, start.elapsed())
