@@ -3,4 +3,4 @@
 /c
 /a.out
 /flamegraph.svg
-/*.data
+/perf.*
