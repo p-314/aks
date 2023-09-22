@@ -48,14 +48,14 @@ impl Polynomial {
             let jmax = if i < self.deg() { i } else { self.deg() };
 
             for j in jmin..=jmax {
-                coef += self.get_coef_unchecked(j) * q.get_coef_unchecked(i - j) % n;
+                coef += self.get_coef_unchecked(j) * q.get_coef_unchecked(i - j);
             }
 
             let jmin = i + r - q.deg();
             let jmax = self.deg();
 
             for j in jmin..=jmax {
-                coef += self.get_coef_unchecked(j) * q.get_coef_unchecked(i + r - j) % n;
+                coef += self.get_coef_unchecked(j) * q.get_coef_unchecked(i + r - j);
             }
 
             coef %= n;
