@@ -1,13 +1,11 @@
-mod aks_prime;
-
 pub mod test {
     use std::{fs, str::FromStr, time::Instant};
-    use crate::aks_prime::aks;
+    use aks::aks_prime::aks;
 
     pub fn test_interval_big() {
         let start = Instant::now();
         let mut primes = 0;
-        for n in 1000000..1000100 {
+        for n in 1000000..1001000 {
             let prime = aks(n);
             if prime {
                 primes += 1;
