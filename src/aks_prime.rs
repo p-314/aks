@@ -1,12 +1,17 @@
 use num::integer::{gcd, Roots};
 use std::vec;
 
+use crate::traits::UInt;
+
+
+//mod traits;
+
 #[derive(Debug)]
-struct Polynomial {
-    coef: Vec<u64>,
+struct Polynomial<I : UInt> {
+    coef: Vec<I>,
 }
 
-impl Polynomial {
+impl<I: UInt> Polynomial<I> {
     fn new() -> Self {
         Polynomial { coef: Vec::new() }
     }
@@ -17,12 +22,12 @@ impl Polynomial {
         }
     }
 
-    fn get_coef_unchecked(&self, m: usize) -> u64 {
-        unsafe { *self.coef.get_unchecked(m) }
+    fn get_coef_unchecked(&self, m: usize) -> &I {
+        unsafe { self.coef.get_unchecked(m) }
     }
 
     #[allow(dead_code)]
-    fn set_coef_unchecked(&mut self, m: usize, c: u64) {
+    fn set_coef_unchecked(&mut self, m: usize, c: I) {
         unsafe {
             *self.coef.get_unchecked_mut(m) = c;
         }
@@ -32,7 +37,7 @@ impl Polynomial {
         self.coef.len() - 1
     }
 
-    fn mod_mul(&self, q: &Polynomial, r: usize, n: u64) -> Polynomial {
+    fn mod_mul(&self, q: &Polynomial<I>, r: usize, n: &I) -> Polynomial<I> {
         let max_deg;
         if self.deg() + q.deg() < r {
             max_deg = self.deg() + q.deg()
@@ -43,19 +48,19 @@ impl Polynomial {
 
         let mut coef;
         for i in 0..=max_deg {
-            coef = 0;
+            coef = I::zero();
             let jmin = if i > q.deg() { i - q.deg() } else { 0 };
             let jmax = if i < self.deg() { i } else { self.deg() };
 
             for j in jmin..=jmax {
-                coef += self.get_coef_unchecked(j) * q.get_coef_unchecked(i - j);
+                coef += self.get_coef_unchecked(j).mul(q.get_coef_unchecked(i - j));
             }
 
             let jmin = i + r - q.deg();
             let jmax = self.deg();
 
             for j in jmin..=jmax {
-                coef += self.get_coef_unchecked(j) * q.get_coef_unchecked(i + r - j);
+                coef += self.get_coef_unchecked(j).mul(q.get_coef_unchecked(i + r - j));
             }
 
             coef %= n;
@@ -65,15 +70,15 @@ impl Polynomial {
     }
 
     // panics if n is zero
-    fn mod_pow(&self, r: usize, n: u64) -> Polynomial {
+    fn mod_pow(&self, r: usize, n: &I) -> Polynomial<I> {
         let mut res = Polynomial::new();
-        res.coef.push(1);
+        res.coef.push(I::one());
 
-        let mut i = n.ilog2() + 1;
+        let mut i = n.bits();
         while i > 0 {
             res = res.mod_mul(&res, r, n);
             i -= 1;
-            if n >> i & 1 == 1 {
+            if n.clone() >> i & I::one() == I::one() {
                 res = res.mod_mul(self, r, n);
             }
         }
@@ -81,14 +86,14 @@ impl Polynomial {
     }
 }
 
-impl PartialEq for Polynomial {
+impl<I: UInt> PartialEq for Polynomial<I> {
     fn eq(&self, other: &Self) -> bool {
         self.coef == other.coef
     }
 }
 
-impl From<Vec<u64>> for Polynomial {
-    fn from(v: Vec<u64>) -> Self {
+impl<I: UInt> From<Vec<I>> for Polynomial<I> {
+    fn from(v: Vec<I>) -> Self {
         Polynomial { coef: v }
     }
 }
@@ -154,7 +159,7 @@ pub fn aks(n: u64) -> bool {
     let rsqrt = (r_ui as f32 - 1.0).sqrt() as u64 + 1;
     let maxa = rsqrt * logn;
     for a in 1..=maxa {
-        let mut xan = Polynomial::from(vec![a , 1]).mod_pow(r_ui as usize, n);
+        let mut xan = Polynomial::from(vec![a , 1]).mod_pow(r_ui as usize, &n);
         let nmodr = (n % r_ui) as usize;
         if xan.deg() < nmodr {
             return false;
@@ -194,8 +199,8 @@ mod test {
     fn mod_pow() {
         let p = Polynomial { coef: vec![1, 1] };
 
-        assert_eq!(p.mod_pow(7, 6), vec![1, 0, 3, 2, 3, 0, 1].into());
-        assert_eq!(p.mod_pow(8, 7), vec![1, 0, 0, 0, 0, 0, 0, 1].into());
+        assert_eq!(p.mod_pow(7, &6), vec![1, 0, 3, 2, 3, 0, 1].into());
+        assert_eq!(p.mod_pow(8, &7), vec![1, 0, 0, 0, 0, 0, 0, 1].into());
     }
 
     fn trial_division(n: u64) -> bool {
