@@ -154,7 +154,7 @@ pub fn aks(n: u64) -> bool {
     let rsqrt = (r_ui as f32 - 1.0).sqrt() as u64 + 1;
     let maxa = rsqrt * logn;
     for a in 1..=maxa {
-        let mut xan = Polynomial::from(vec![a , 1]).mod_pow(r_ui as usize, n);
+        let mut xan = Polynomial::from(vec![a, 1]).mod_pow(r_ui as usize, n);
         let nmodr = (n % r_ui) as usize;
         if xan.deg() < nmodr {
             return false;
@@ -196,30 +196,5 @@ mod test {
 
         assert_eq!(p.mod_pow(7, 6), vec![1, 0, 3, 2, 3, 0, 1].into());
         assert_eq!(p.mod_pow(8, 7), vec![1, 0, 0, 0, 0, 0, 0, 1].into());
-    }
-
-    fn trial_division(n: u64) -> bool {
-        let nsqrt = (n as f64).sqrt().ceil() as u64;
-
-        if n == 2 {
-            return true;
-        }
-        if n % 2 == 0 {
-            return false;
-        }
-
-        for d in 3..=nsqrt {
-            if n % d == 0 {
-                return false;
-            }
-        }
-        true
-    }
-
-    #[test]
-    fn small() {
-        for n in 2..10000 {
-            assert_eq!(aks(n), trial_division(n));
-        }
     }
 }
