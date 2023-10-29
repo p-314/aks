@@ -12,12 +12,19 @@ pub trait UInt:
     + BitAnd<Output = Self>
     + Clone
     + for<'a> Mul<&'a Self>
+//where
+//    for<'b> &'b Self: Mul,
 {
     fn bits(&self) -> u64;
 
-    fn mul(&self, rhs: &Self) -> Self; 
+    fn mul(&self, rhs: &Self) -> Self;
 }
 
+/*
+impl<T: UInt> Mul for &T {
+
+}
+*/
 
 impl UInt for u64 {
     fn bits(&self) -> u64 {
